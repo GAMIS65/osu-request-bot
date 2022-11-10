@@ -1,6 +1,6 @@
 const tmi = require('tmi.js');
 import { ChatUserstate } from 'tmi.js';
-import { getMap } from './map-processor';
+import { getMap, checkMap } from './map-processor';
 import { sendBanchoMessage } from './bancho';
 
 const STREAMER_OSU_USERNAME = process.env.STREAMER_OSU_USERNAME;
@@ -65,6 +65,9 @@ client.on('message', async (channel: string, tags: ChatUserstate, message: strin
 
     const beatmap = await getMap(mapId);
     if(!beatmap) return;
+
+    const validMap = checkMap(beatmap);
+    if(!validMap) return;
 
     let minutes = Math.floor(beatmap.length.total / 60);
     let seconds = beatmap.length.total - minutes * 60;

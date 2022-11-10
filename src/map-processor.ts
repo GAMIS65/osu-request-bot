@@ -16,3 +16,17 @@ export const getMap = async (mapId: string): Promise<Beatmap> => {
         return beatmaps[0];
     });
 }
+
+export const checkMap = (beatmap: Beatmap) => {
+    // TODO: DB
+    let MAX_SR = 0;
+    let MIN_SR = 0;
+    let MAX_LENGTH = 0;
+    let isBlacklisted = false;
+
+    if(isBlacklisted) return false;
+    if(MAX_SR > 0 && Math.round(beatmap.difficulty.rating * 100) / 100 > MAX_SR) return false;
+    if(Math.round(beatmap.difficulty.rating * 100) / 100 < MIN_SR) return false;
+    if(MAX_LENGTH > 0 && beatmap.length.total > MAX_LENGTH) return false;
+    return true;
+}
