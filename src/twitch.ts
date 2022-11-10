@@ -1,13 +1,16 @@
 const tmi = require('tmi.js');
 import { ChatUserstate } from 'tmi.js';
 import { getMap } from './map-processor';
+import { sendBanchoMessage } from './bancho';
+
+const STREAMER_OSU_USERNAME = process.env.STREAMER_OSU_USERNAME;
 
 const client = new tmi.Client({
     connection: {
         secure: true,
         reconnect: true
     },
-    channels: ['gamis65'] // TODO: Get channels from DB
+    channels: [process.env.STREAMER_CHANNEL_NAME] // TODO: Get channels from DB
 });
 
 const getMapLinkFromMessage = (message: string): string | undefined  => {
@@ -61,5 +64,12 @@ client.on('message', async (channel: string, tags: ChatUserstate, message: strin
     if(!mapId) return;
 
     const beatmap = await getMap(mapId);
-    if(beatmap) console.log(`[${viewerType}] ${tags['display-name']} requested ${beatmap.title} ${Math.round(beatmap.difficulty.rating * 100) / 100}* ${beatmap.bpm} BPM`);
+    if(!beatmap) return;
+
+    let minutes = Math.floor(beatmap.length.total / 60);
+    let seconds = beatmap.length.total - minutes * 60;
+
+    // This is temporary 
+    //@ts-ignore
+    await sendBanchoMessage(STREAMER_OSU_USERNAME, `[${viewerType}] ${tags['display-name']} > [${beatmap.approvalStatus}] [https://osu.ppy.sh/b/${mapId[0]} ${beatmap.artist} - ${beatmap.title} [${beatmap.version}]] (${Math.round(beatmap.difficulty.rating * 100) / 100}*, ${minutes}:${seconds}, ${beatmap.bpm} BPM)`);
 })
