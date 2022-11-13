@@ -27,6 +27,7 @@
   "dependencies": {
     "bancho.js": "^0.10.1",
     "dotenv": "^16.0.3",
+    "mongoose": "^6.7.2",
     "node-osu": "^2.2.1",
     "tmi.js": "^1.8.5"
   }
