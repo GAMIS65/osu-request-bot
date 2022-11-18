@@ -49,7 +49,7 @@ async function run() {
         const beatmap = await getMap(mapId);
         if(!beatmap) return;
     
-        const validMap = checkMap(beatmap);
+        const validMap = await checkMap(beatmap, channel);
         if(!validMap) return;
     
         let minutes = Math.floor(beatmap.length.total / 60);

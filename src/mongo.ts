@@ -4,7 +4,7 @@ require('dotenv').config();
 
 mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser: true})
     .then(console.log('Connected to the database!'))
-    .catch((e: Error) => console.log(`Mongodb: ${e}`));
+    .catch((e: Error) => console.log(e));
 
 export const addUser = (osuId: number, osuUsername: string, twitchUsername: string) => {
     try {
@@ -26,6 +26,12 @@ export const getChannels = async () => {
     });
     return channels_arr;
 } 
+
+export const getBeatmapRequirements = async (channel_username: string) => {
+    channel_username = channel_username.replace('#','');
+    const result = await Channel.findOne({twitch_username: channel_username});
+    return result.map_requirements;
+}
 
 export const getOsuId = async (channel: string) => {
     let id = await Channel.findOne({twitch_username: channel}).exec();

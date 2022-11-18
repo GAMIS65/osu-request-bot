@@ -1,5 +1,6 @@
 const osu = require('node-osu');
 import { Beatmap } from 'node-osu';
+import { getBeatmapRequirements } from './mongo';
 
 require('dotenv').config();
 
@@ -17,16 +18,16 @@ export const getMap = async (mapId: string): Promise<Beatmap> => {
     });
 }
 
-export const checkMap = (beatmap: Beatmap) => {
-    // TODO: DB
-    let MAX_SR = 0;
-    let MIN_SR = 0;
-    let MAX_LENGTH = 0;
-    let isBlacklisted = false;
+export const checkMap = async (beatmap: Beatmap, channel_username: string) => {
+    const map_requirements = await getBeatmapRequirements(channel_username);
+    const MAX_SR = map_requirements.MAX_SR;
+    const MIN_SR = map_requirements.MIN_SR;
+    const MAX_LENGTH = map_requirements.MAX_LENGTH;
+    const blacklist = map_requirements.map_blacklist;
 
-    if(isBlacklisted) return false;
-    if(MAX_SR > 0 && Math.round(beatmap.difficulty.rating * 100) / 100 > MAX_SR) return false;
-    if(Math.round(beatmap.difficulty.rating * 100) / 100 < MIN_SR) return false;
-    if(MAX_LENGTH > 0 && beatmap.length.total > MAX_LENGTH) return false;
+    if(blacklist.includes(beatmap.beatmapSetId)) return false; // Check if map is blacklisted
+    if(MAX_SR > 0 && Math.round(beatmap.difficulty.rating * 100) / 100 > MAX_SR) return false; // Check if its SR is higher than MAX_SR
+    if(Math.round(beatmap.difficulty.rating * 100) / 100 < MIN_SR) return false; // Check if its SR is lower than MIN_SR
+    if(MAX_LENGTH > 0 && beatmap.length.total > MAX_LENGTH) return false; // Check if map is longer than MAX_LENGTH
     return true;
 }
