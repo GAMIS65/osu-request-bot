@@ -18,6 +18,22 @@ async function run() {
     client.connect().then(() => {
         console.log('Connected to Twitch!');
     }).catch(console.error);
+
+    const updateChannels = async (twitchChannels: Array<string>) => {
+        let updatedChannels = await getChannels();
+        updatedChannels = updatedChannels.map(i => '#' + i);
+
+        if(twitchChannels.toString() !== updatedChannels.toString()) {
+            client.channels = updatedChannels;
+            client.opts.channels = updatedChannels;
+            client.disconnect().then(() => client.connect()).catch((e: Error) => console.log(e));
+        }
+    }
+
+    // Update channel list every minute
+    setInterval(async function() {
+        await updateChannels(client.opts.channels);
+    }, 60000);
     
     client.on('message', async (channel: string, tags: ChatUserstate, message: string, self: boolean) => {
         const mapLink = getMapLinkFromMessage(message);

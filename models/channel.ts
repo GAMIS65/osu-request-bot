@@ -10,6 +10,7 @@ const channelSchema = new Schema({
 
     twitch_username: {
         type: String,
+        require: true
     },
 
     requests_enabled: {

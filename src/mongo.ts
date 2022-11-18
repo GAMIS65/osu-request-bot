@@ -4,7 +4,7 @@ require('dotenv').config();
 
 mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser: true})
     .then(console.log('Connected to the database!'))
-    .catch((e: Error) => console.log(e));
+    .catch((e: Error) => console.log(`Mongodb: ${e}`));
 
 export const addUser = (osuId: number, osuUsername: string, twitchUsername: string) => {
     try {
@@ -20,14 +20,11 @@ export const addUser = (osuId: number, osuUsername: string, twitchUsername: stri
 
 export const getChannels = async () => {
 	let channels_arr: string[] = [];
-	let channels = await Channel.find({}, function(e: Error, channels: Array<string>) {
-	
-		channels.forEach(function(channel) {
-			// @ts-ignore
-			channels_arr.push(channel.twitch_username)
-		});
-	}).clone();
-	return channels_arr;
+    let channels = await Channel.find({}, {twitch_username: 1})
+    channels.forEach(function(channel: any) {
+        channels_arr.push(channel.twitch_username)
+    });
+    return channels_arr;
 } 
 
 export const getOsuId = async (channel: string) => {

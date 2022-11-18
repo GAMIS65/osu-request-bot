@@ -17,8 +17,12 @@ client.on('PM', async (message: BanchoMessage) => {
 	const splitMessage = message.content.split(" ");
 	if(splitMessage[0] === '!register') {
 		try {
-			await addUser(message.user.id, message.user.ircUsername, splitMessage[1])
-			await sendBanchoMessage(message.user.ircUsername, `Registered successfully! Type !help for help`);
+			if(splitMessage[1]) {
+				await addUser(message.user.id, message.user.ircUsername, splitMessage[1])
+				await sendBanchoMessage(message.user.ircUsername, `Registered successfully! The bot will listen for requests in a minute or two. Type !help for help`);
+			} else {
+				await sendBanchoMessage(message.user.ircUsername, `You forgot to add your twitch username!`);
+			}
 		} catch (e: any) {
 			if (e.code === 11000) return await sendBanchoMessage(message.user.ircUsername, `You are already registered! Type !help for help`);
 			await sendBanchoMessage(message.user.ircUsername, `Something went wrong! ${e}`);
