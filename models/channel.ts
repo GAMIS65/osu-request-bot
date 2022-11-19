@@ -3,6 +3,12 @@ const Schema = mongoose.Schema;
 
 
 const channelSchema = new Schema({
+    osu_id: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+
     osu_username: {
         type: String,
         required: true,

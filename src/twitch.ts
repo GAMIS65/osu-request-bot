@@ -65,10 +65,7 @@ async function run() {
         let minutes = Math.floor(beatmap.length.total / 60);
         let seconds = beatmap.length.total - minutes * 60;
 
-        // @ts-ignore
-        const osuId = channelData.osu_username;
-
-        await sendBanchoMessage(osuId, `[${viewerType}] ${tags['display-name']} > [${beatmap.approvalStatus}] [https://osu.ppy.sh/b/${mapId[0]} ${beatmap.artist} - ${beatmap.title} [${beatmap.version}]] (${Math.round(beatmap.difficulty.rating * 100) / 100}*, ${minutes}:${seconds}, ${beatmap.bpm} BPM)`);
+        await sendBanchoMessage(channelData.osu_id, `[${viewerType}] ${tags['display-name']} > [${beatmap.approvalStatus}] [https://osu.ppy.sh/b/${mapId[0]} ${beatmap.artist} - ${beatmap.title} [${beatmap.version}]] (${Math.round(beatmap.difficulty.rating * 100) / 100}*, ${minutes}:${seconds}, ${beatmap.bpm} BPM)`);
     })
 }
 

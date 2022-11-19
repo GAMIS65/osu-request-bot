@@ -6,7 +6,7 @@ mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser: true})
     .then(console.log('Connected to the database!'))
     .catch((e: Error) => console.log(e));
 
-export const addUser = (osuId: number, osuUsername: string, twitchUsername: string) => {
+export const addUser = (osuId: string, osuUsername: string, twitchUsername: string) => {
     try {
         return Channel.create({
             osu_id: osuId,
@@ -30,6 +30,10 @@ export const getChannels = async () => {
 export const getChannelData = async (channelUsername: string) => {
     const result = await Channel.findOne({twitch_username: channelUsername});
     return result;
+}
+
+export const updateData = async (osuId: number, value: string | number) => {
+    return null;
 }
 
 export const db = mongoose.connection;

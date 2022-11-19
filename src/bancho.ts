@@ -1,4 +1,5 @@
 import { BanchoMessage } from "bancho.js";
+import { getUserId } from "./map-processor";
 import { addUser, getChannels } from "./mongo";
 const Banchojs = require("bancho.js");
 require('dotenv').config();
@@ -8,11 +9,11 @@ export const sendBanchoMessage = async(user: string | number, text: string) => {
 	await recipient.sendMessage(text);
 }
 
-const register = async (message: BanchoMessage, twitchUsername: string) => {
+const register = async (message: BanchoMessage, userId: string, twitchUsername: string) => {
 	try {
 		// TODO: Verify twitch account
 		if(twitchUsername) {
-			await addUser(message.user.id, message.user.ircUsername, twitchUsername)
+			await addUser(userId, message.user.ircUsername, twitchUsername);
 			await sendBanchoMessage(message.user.ircUsername, `Registered successfully! The bot will listen for requests in a minute or two. Type !help for help`);
 		} else {
 			await sendBanchoMessage(message.user.ircUsername, `You forgot to add your twitch username!`);
@@ -36,7 +37,11 @@ client.on('PM', async (message: BanchoMessage) => {
 			break;
 
 		case '!register':
-			await register(message, splitMessage[1]);
+			const userId = await getUserId(message.user.ircUsername); // Moved this here just in case someone spams messages
+			await register(message, userId, splitMessage[1]);
+			break;
+		
+		case '!set':
 			break;
 		
 		default:

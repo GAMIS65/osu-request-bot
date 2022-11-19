@@ -1,5 +1,5 @@
 const osu = require('node-osu');
-import { Beatmap } from 'node-osu';
+import { Beatmap, User } from 'node-osu';
 
 require('dotenv').config();
 
@@ -11,10 +11,15 @@ const osuApi = new osu.Api(process.env.OSU_API_TOKEN, {
 
 
 export const getMap = async (mapId: string): Promise<Beatmap> => {
-    let beatmap;
     return osuApi.getBeatmaps({ b: mapId }).then((beatmaps: Array<Beatmap>) => {
         return beatmaps[0];
     });
+}
+
+export const getUserId = async (osuUsername: string): Promise<string> => {
+    return osuApi.getUser({u: osuUsername}).then((user: User) => {
+        return user.id;
+    })
 }
 
 export const checkMap = async (beatmap: Beatmap, requirements: any) => {
