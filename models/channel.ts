@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+
 const channelSchema = new Schema({
     osu_username: {
         type: String,
@@ -16,6 +17,11 @@ const channelSchema = new Schema({
     requests_enabled: {
         type: Boolean,
         default: true
+    },
+
+    sub_only: {
+        type: Boolean,
+        default: false
     },
 
     map_requirements: {

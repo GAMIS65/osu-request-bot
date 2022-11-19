@@ -2,7 +2,7 @@ const tmi = require('tmi.js');
 import { ChatUserstate } from 'tmi.js';
 import { getMap, checkMap } from './map-processor';
 import { sendBanchoMessage } from './bancho';
-import { getChannels, getOsuId } from './mongo';
+import { getChannelData, getChannels } from './mongo';
 
 async function run() {
 	let twitchChannels = await getChannels();
@@ -38,9 +38,18 @@ async function run() {
     client.on('message', async (channel: string, tags: ChatUserstate, message: string, self: boolean) => {
         const mapLink = getMapLinkFromMessage(message);
         if(!mapLink) return;
-    
+
+        channel = channel.replace('#','');
+
+        const channelData = await getChannelData(channel);
+        
+        // TODO: Create a channel interface
+        // @ts-ignore
+        if(!channelData.requests_enabled) return;
+
         const viewerType = getViewerType(tags);
-        const canViewerRequest = checkViewerPerms(tags, viewerType);
+        // @ts-ignore
+        const canViewerRequest = checkViewerPerms(tags, viewerType, channelData.sub_only, channelData.viewer_blacklist);
         if(!canViewerRequest) return;
     
         const mapId = getDiffFromMessage(message);
@@ -48,14 +57,16 @@ async function run() {
     
         const beatmap = await getMap(mapId);
         if(!beatmap) return;
-    
-        const validMap = await checkMap(beatmap, channel);
+        
+        // @ts-ignore
+        const validMap = await checkMap(beatmap, channelData.map_requirements);
         if(!validMap) return;
     
         let minutes = Math.floor(beatmap.length.total / 60);
         let seconds = beatmap.length.total - minutes * 60;
 
-        const osuId = await getOsuId(channel.substring(1))
+        // @ts-ignore
+        const osuId = channelData.osu_username;
 
         await sendBanchoMessage(osuId, `[${viewerType}] ${tags['display-name']} > [${beatmap.approvalStatus}] [https://osu.ppy.sh/b/${mapId[0]} ${beatmap.artist} - ${beatmap.title} [${beatmap.version}]] (${Math.round(beatmap.difficulty.rating * 100) / 100}*, ${minutes}:${seconds}, ${beatmap.bpm} BPM)`);
     })
@@ -88,12 +99,8 @@ const getViewerType = (viewer: ChatUserstate): string => {
     return 'Viewer';
 }
 
-const checkViewerPerms = (viewer: ChatUserstate, viewerType: string) => {
-    // TODO: Add these things to DB
-    let isBlacklisted = false; 
-    let subOnly = false;
-
-    if(isBlacklisted) return false;
-    if(subOnly && viewerType === 'Viewer') return false; // TODO: Change this to check an array of allowed viewer types instead
+const checkViewerPerms = (viewer: ChatUserstate, viewerType: string, subOnly: boolean, blacklist: Array<string>) => {
+    if(viewer.username && blacklist.includes(viewer.username)) return false;
+    if(subOnly && viewerType === 'Viewer') return false;
     return true;
 }

@@ -17,6 +17,7 @@ client.on('PM', async (message: BanchoMessage) => {
 	const splitMessage = message.content.split(" ");
 	if(splitMessage[0] === '!register') {
 		try {
+			// TODO: Verify twitch account
 			if(splitMessage[1]) {
 				await addUser(message.user.id, message.user.ircUsername, splitMessage[1])
 				await sendBanchoMessage(message.user.ircUsername, `Registered successfully! The bot will listen for requests in a minute or two. Type !help for help`);

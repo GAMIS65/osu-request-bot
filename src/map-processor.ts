@@ -1,6 +1,5 @@
 const osu = require('node-osu');
 import { Beatmap } from 'node-osu';
-import { getBeatmapRequirements } from './mongo';
 
 require('dotenv').config();
 
@@ -18,12 +17,11 @@ export const getMap = async (mapId: string): Promise<Beatmap> => {
     });
 }
 
-export const checkMap = async (beatmap: Beatmap, channel_username: string) => {
-    const map_requirements = await getBeatmapRequirements(channel_username);
-    const MAX_SR = map_requirements.MAX_SR;
-    const MIN_SR = map_requirements.MIN_SR;
-    const MAX_LENGTH = map_requirements.MAX_LENGTH;
-    const blacklist = map_requirements.map_blacklist;
+export const checkMap = async (beatmap: Beatmap, requirements: any) => {
+    const MAX_SR = requirements.MAX_SR;
+    const MIN_SR = requirements.MIN_SR;
+    const MAX_LENGTH = requirements.MAX_LENGTH;
+    const blacklist = requirements.map_blacklist;
 
     if(blacklist.includes(beatmap.beatmapSetId)) return false; // Check if map is blacklisted
     if(MAX_SR > 0 && Math.round(beatmap.difficulty.rating * 100) / 100 > MAX_SR) return false; // Check if its SR is higher than MAX_SR

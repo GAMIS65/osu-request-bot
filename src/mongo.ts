@@ -27,15 +27,9 @@ export const getChannels = async () => {
     return channels_arr;
 } 
 
-export const getBeatmapRequirements = async (channel_username: string) => {
-    channel_username = channel_username.replace('#','');
-    const result = await Channel.findOne({twitch_username: channel_username});
-    return result.map_requirements;
-}
-
-export const getOsuId = async (channel: string) => {
-    let id = await Channel.findOne({twitch_username: channel}).exec();
-    return id.osu_username;
+export const getChannelData = async (channelUsername: string) => {
+    const result = await Channel.findOne({twitch_username: channelUsername});
+    return result;
 }
 
 export const db = mongoose.connection;
