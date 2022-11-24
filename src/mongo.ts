@@ -28,12 +28,14 @@ export const getChannels = async () => {
 } 
 
 export const getChannelData = async (channelUsername: string) => {
-    const result = await Channel.findOne({twitch_username: channelUsername});
-    return result;
+    return await Channel.findOne({twitch_username: channelUsername});
 }
 
-export const updateData = async (osuId: number, value: string | number) => {
-    return null;
+export const updateData = async (osuId: string, field: string, value: string | number) => {
+    const editableFields = ['twitch_username', 'requests_enabled', 'sub_only', 'map_requirements.MAX_SR', 'map_requirements.MIN_SR', 'map_requirements.MAX_LENGTH', 'map_blacklist', 'viewer_blacklist'];
+    
+    if(!editableFields.includes(field)) throw `You can't edit this field!`;
+    return await Channel.findOneAndUpdate({osu_id: osuId}, {[`${field}`]: value});
 }
 
 export const db = mongoose.connection;
